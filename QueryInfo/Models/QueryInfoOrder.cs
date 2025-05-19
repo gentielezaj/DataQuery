@@ -1,4 +1,5 @@
-﻿using QueryInfo.Utilities;
+﻿using System.Diagnostics.CodeAnalysis;
+using QueryInfo.Utilities;
 using System.Linq.Expressions;
 
 namespace QueryInfo.Models;
@@ -10,6 +11,15 @@ public interface IOrderInfo<TEntity>
     IOrderInfo<TEntity>? ThenOrderBy { get; }
 
     IOrderInfo<TEntity> ThenBy(IOrderInfo<TEntity> thenBy);
+
+    OrderInfo<TEntity, TNextProperty> ThenByAsc<TNextProperty>(Expression<Func<TEntity, TNextProperty>> selector);
+
+    OrderInfo<TEntity, TNextProperty> ThenByDesc<TNextProperty>(Expression<Func<TEntity, TNextProperty>> selector);
+
+    OrderInfo<TEntity, TNextProperty> ThenBy<TNextProperty>(Expression<Func<TEntity, TNextProperty>> selector,
+        OrderInfoDirections direction);
+    IOrderInfo<TEntity> AddOrderBy(IOrderInfo<TEntity>? thenBy);
+    IOrderInfo<TEntity> AddOrderBy(IEnumerable<IOrderInfo<TEntity>>? thenBy);
 
     IQueryable<TEntity> ToQueryable(IQueryable<TEntity> source);
 
@@ -46,6 +56,26 @@ public class OrderInfo<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> 
         return ThenBy(selector, OrderInfoDirections.Desc);
     }
 
+    public IOrderInfo<TEntity> AddOrderBy(IOrderInfo<TEntity>? thenBy)
+        => AddOrderBy(thenBy is null ? null : [thenBy]);
+    
+    public IOrderInfo<TEntity> AddOrderBy(IEnumerable<IOrderInfo<TEntity>>? thenBy)
+    {
+        if (thenBy?.Any() != true)
+        {
+            return this;
+        }
+            
+        if (ThenOrderBy is not null)
+        {
+            return ThenOrderBy.AddOrderBy(thenBy);
+        }
+        
+        var q = new Queue<IOrderInfo<TEntity>>(thenBy);
+        ThenOrderBy = q.Dequeue();
+        return ThenOrderBy.AddOrderBy(q.ToArray());
+    }
+    
     public IQueryable<TEntity> ToQueryable(IQueryable<TEntity> source)
     {
         var orderInfos = GetOrderList();

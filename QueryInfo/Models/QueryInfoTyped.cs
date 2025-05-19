@@ -81,11 +81,26 @@ public class QueryInfo<TEntity> : CoreQueryInfo
 
     #region order
 
-    public OrderInfo<TEntity, TProperty> Order<TProperty>(Expression<Func<TEntity, TProperty>> selector, OrderInfoDirections direction)
+    public IOrderInfo<TEntity> Order<TProperty>(Expression<Func<TEntity, TProperty>> selector, OrderInfoDirections direction)
     {
-        var i = new OrderInfo<TEntity, TProperty>(selector, direction);
-        OrderInfo = i;
-        return i;
+        OrderInfo = new OrderInfo<TEntity, TProperty>(selector, direction);
+        return OrderInfo;
+    }
+
+    public QueryInfo<TEntity> AddOrder<TProperty>(Expression<Func<TEntity, TProperty>> selector,
+        OrderInfoDirections direction)
+    {
+        var order = new OrderInfo<TEntity, TProperty>(selector, direction);
+        if (OrderInfo is null)
+        {
+            OrderInfo = order;
+        }
+        else
+        {
+             OrderInfo.AddOrderBy(order);
+        }
+        
+        return this;
     }
 
     public QueryInfo<TEntity> SetOrder<TProperty>(Expression<Func<TEntity, TProperty>> selector, OrderInfoDirections direction)
@@ -93,18 +108,14 @@ public class QueryInfo<TEntity> : CoreQueryInfo
 
     public QueryInfo<TEntity> SetOrder(params IOrderInfo<TEntity>[] orders)
     {
-        if (orders is null || orders.Length == 0)
+        if (orders.Length == 0)
         {
             return this;
         }
 
         var quqer = new Queue<IOrderInfo<TEntity>>(orders);
         OrderInfo = quqer.Dequeue();
-        var order = OrderInfo;
-        while (quqer.Count > 0)
-        {
-            order = order.ThenBy(quqer.Dequeue());
-        }
+        OrderInfo = OrderInfo.AddOrderBy(quqer);
 
         return this;
     }
@@ -123,7 +134,7 @@ public class QueryInfo<TEntity> : CoreQueryInfo
         return this;
     }
 
-    public QueryInfo<TEntity> SetRestrictions(Expression<Func<TEntity, bool>> where)
+    public QueryInfo<TEntity> SetWhere(Expression<Func<TEntity, bool>> where)
     {
         Where = where;
         return this;
@@ -173,36 +184,5 @@ public class QueryInfo<TEntity> : CoreQueryInfo
 
         return includePropertiesData.ToQueryable(source);
     }
-    #endregion include 
-
-    private IQueryable<TEntity> OrderBy(IQueryable<TEntity> source, OrderInfo[] orderInfos)
-    {
-        if (orderInfos.Any() != true)
-        {
-            return source;
-        }
-        
-        var expression = source.Expression;
-        var count = 0;
-        foreach (var item in orderInfos)
-        {
-            var paths = item.Field.Split(".");
-            foreach (var path in paths)
-            {
-                var parameter = Expression.Parameter(typeof(TEntity), "x");
-                Expression selector = Expression.PropertyOrField(parameter, path);
-
-                var methodName = Equals(item.Direction, OrderInfoDirections.Desc)
-                    ? (count == 0 ? "OrderByDescending" : "ThenByDescending")
-                    : (count == 0 ? "OrderBy" : "ThenBy");
-
-                expression = Expression.Call(typeof(Queryable), methodName,
-                    [source.ElementType, selector.Type],
-                    expression, Expression.Quote(Expression.Lambda(selector, parameter)));
-                count++;
-            }
-        }
-
-        return count > 0 ? source.Provider.CreateQuery<TEntity>(expression) : source;
-    }
+    #endregion include
 }

@@ -13,8 +13,8 @@ namespace QueryInfo.Test
             var queryInfo = new QueryInfo<Student>()
                 .SetIncludeEntity(x => x.School)
                 .SetIncludeList(x => x.Grades)
-                .SetRestrictions(x => x.Name == "Jane Roe")
-                .SetOrder(x => x.Id, OrderInfoDirections.Asc);
+                .SetWhere(x => x.Name == "Jane Roe")
+                .AddOrder(x => x.Id, OrderInfoDirections.Asc);
 
             using var db = new AppDbContest();
             db.Database.EnsureCreated();
