@@ -1,4 +1,6 @@
-﻿namespace QueryInfo.Models;
+﻿using System.Linq.Expressions;
+
+namespace QueryInfo.Models;
 
 public class QueryInfo : CoreQueryInfo
 {
@@ -25,8 +27,40 @@ public class QueryInfo : CoreQueryInfo
 
     private IOrderInfo<T>? ToOrderInfo<T>()
     {
-        // TODO: Implement the logic to convert OrderInfo to IOrderInfo<T>
-        return null;
+        if (Order?.Any() != true)
+        {
+            return null;
+        }
+
+        IOrderInfo<T>? orderInfo = null;
+        IOrderInfo<T> rootOrder;
+
+        foreach (var item in Order)
+        {
+            var parameter = Expression.Parameter(typeof(T), "x");
+            Expression body = parameter;
+            foreach (var member in item.Field.Split('.'))
+            {
+                body = Expression.PropertyOrField(body, member);
+            }
+            // Box value types to object
+            if (body.Type.IsValueType)
+                body = Expression.Convert(body, typeof(object));
+
+            var expression = Expression.Lambda<Func<T, object>>(body, parameter);
+            var orderInfoInstance = new OrderInfo<T, object>(expression, item.Direction);
+            if (orderInfo is null)
+            {
+                orderInfo = orderInfoInstance;
+                rootOrder = orderInfoInstance;
+            }
+            else
+            {
+                orderInfo = orderInfo.ThenBy(orderInfoInstance);
+            }
+        }
+
+        return orderInfo;
     }
 }
 
