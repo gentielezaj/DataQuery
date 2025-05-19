@@ -33,4 +33,25 @@ public class ThenIncludeInfoEntity<TPreviousProperty, TNextProperty>(
             ? included
             : thenIncludes.ToQueryableEntity(included!);
     }
+
+    public IQueryable<TSource> ToQueryable<TSource>(IQueryable<TSource> source)
+    {
+        var rootType = typeof(TNextProperty);
+        var expression = source.Expression;
+
+        var property = GetPropertyInfo();
+        var parameter = Expression.Parameter(rootType, "x");
+        Expression selector = Expression.PropertyOrField(parameter, property.Name);
+
+        Expression quote = Expression.Quote(Expression.Lambda(selector, parameter));
+        expression = Expression.Call(typeof(EntityFrameworkQueryableExtensions), "ThenInclude",
+            new[] { source.ElementType, rootType, selector.Type },
+            expression, quote);
+
+        var query = source.Provider.CreateQuery<TSource>(expression);
+
+        return ThenIncludes is null
+            ? query
+            : ThenIncludes.ToQueryable(query);
+    }
 }

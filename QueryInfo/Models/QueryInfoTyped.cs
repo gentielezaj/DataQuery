@@ -53,7 +53,7 @@ public class QueryInfo<TEntity> : CoreQueryInfo
     }
 
     public IncludeInfoList<TEntity, TProperty> IncludeList<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property,
-        Func<TProperty, bool>? filter = null)
+        Expression<Func<TProperty, bool>>? filter = null)
         where TProperty : class
     {
         _includes ??= new();
@@ -70,7 +70,7 @@ public class QueryInfo<TEntity> : CoreQueryInfo
         return this;
     }
 
-    public QueryInfo<TEntity> SetIncludeList<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property, Func<TProperty, bool>? filter = null)
+    public QueryInfo<TEntity> SetIncludeList<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property, Expression<Func<TProperty, bool>>? filter = null)
         where TProperty : class
     {
         IncludeList<TProperty>(property, filter);

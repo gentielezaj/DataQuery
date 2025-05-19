@@ -22,6 +22,8 @@ public interface IOrderInfo<TEntity>
     IOrderInfo<TEntity> AddOrderBy(IEnumerable<IOrderInfo<TEntity>>? thenBy);
 
     IQueryable<TEntity> ToQueryable(IQueryable<TEntity> source);
+    
+    Expression? ToExpression(Expression expression);
 
     IEnumerable<KeyValuePair<string, OrderInfoDirections>> GetOrderList();
 }
@@ -84,7 +86,16 @@ public class OrderInfo<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> 
             return source;
         }
 
-        var expression = source.Expression;
+        var expression = ToExpression(source.Expression);
+
+        return expression is not null 
+            ? source.Provider.CreateQuery<TEntity>(expression) 
+            : source;
+    }
+    
+    public Expression? ToExpression(Expression expression)
+    {
+        var orderInfos = GetOrderList();
         var count = 0;
         foreach (var item in orderInfos)
         {
@@ -99,13 +110,13 @@ public class OrderInfo<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> 
                     : (count == 0 ? "OrderBy" : "ThenBy");
 
                 expression = Expression.Call(typeof(Queryable), methodName,
-                    [source.ElementType, selector.Type],
+                    [typeof(TEntity), selector.Type],
                     expression, Expression.Quote(Expression.Lambda(selector, parameter)));
                 count++;
             }
         }
 
-        return count > 0 ? source.Provider.CreateQuery<TEntity>(expression) : source;
+        return count > 0 ? expression : null;
     }
 
     public IEnumerable<KeyValuePair<string, OrderInfoDirections>> GetOrderList()

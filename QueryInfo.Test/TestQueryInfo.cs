@@ -12,7 +12,7 @@ namespace QueryInfo.Test
         {
             var queryInfo = new QueryInfo<Student>()
                 .SetIncludeEntity(x => x.School)
-                .SetIncludeList(x => x.Grades)
+                .SetIncludeList(x => x.Grades, x => x.Value == "B")
                 .SetWhere(x => x.Name == "Jane Roe")
                 .AddOrder(x => x.Id, OrderInfoDirections.Asc);
 

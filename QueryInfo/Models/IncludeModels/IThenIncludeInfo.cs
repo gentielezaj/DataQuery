@@ -11,4 +11,6 @@ public interface IThenIncludeInfo<in TPreviousProperty>
 
     IQueryable<TSource> ToQueryableList<TSource>(IIncludableQueryable<TSource, IEnumerable<TPreviousProperty>> source)
         where TSource : class;
+
+    IQueryable<TSource> ToQueryable<TSource>(IQueryable<TSource> source);
 }

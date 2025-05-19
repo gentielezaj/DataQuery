@@ -23,7 +23,7 @@ public abstract class CoreIncludeInfo<TEntity, TProperty, TPropertyCore>(
 
     public ThenIncludeInfoList<TPropertyCore, TNextProperty> ThenIncludeList<TNextProperty>(
         Expression<Func<TPropertyCore, IEnumerable<TNextProperty>?>> navigation,
-        Func<TNextProperty, bool>? filter = null) where TNextProperty : class
+        Expression<Func<TNextProperty, bool>>? filter = null) where TNextProperty : class
     {
         var thenIncludeInfo = new ThenIncludeInfoList<TPropertyCore, TNextProperty>(navigation, filter, null);
         ThenIncludes = thenIncludeInfo;

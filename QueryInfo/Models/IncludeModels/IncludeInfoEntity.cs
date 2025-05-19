@@ -15,7 +15,6 @@ public class IncludeInfoEntity<TEntity, TProperty>(
     public IQueryable<TEntity> ToQueryable(IQueryable<TEntity> source)
     {
         var include = source.Include(Navigation);
-
         return ThenIncludes is null
             ? include
             : ThenIncludes.ToQueryableEntity(include!);
