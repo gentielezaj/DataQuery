@@ -76,6 +76,17 @@ public class QueryInfo<TEntity> : CoreQueryInfo
         IncludeList<TProperty>(property, filter);
         return this;
     }
+    
+    public QueryInfo<TEntity> SetIncludeList<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property, Func<IncludeInfoList<TEntity, TProperty>, IncludeInfoList<TEntity, TProperty>> config)
+        where TProperty : class
+    {
+        _includes ??= new();
+        var includeInfo = new IncludeInfoList<TEntity, TProperty>(property, null, null);
+        includeInfo = config(includeInfo);
+        _includes.Add(includeInfo);
+        
+        return this;
+    }
 
     #endregion include
 

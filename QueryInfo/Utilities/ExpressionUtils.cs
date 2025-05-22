@@ -22,26 +22,5 @@ namespace QueryInfo.Utilities
             }
             throw new ArgumentException("LambdaExpression is not a property access", nameof(lambda));
         }
-
-        public static string GetPropertyPath(LambdaExpression expression)
-        {
-            var path = new Stack<string>();
-            Expression? expr = expression.Body;
-
-            while (expr is MemberExpression memberExpr)
-            {
-                path.Push(memberExpr.Member.Name);
-                expr = memberExpr.Expression;
-            }
-
-            // Handle conversions (e.g., object casting)
-            if (expr is UnaryExpression unaryExpr && unaryExpr.Operand is MemberExpression member)
-            {
-                path.Push(member.Member.Name);
-                expr = member.Expression;
-            }
-
-            return string.Join(".", path);
-        }
     }
 }

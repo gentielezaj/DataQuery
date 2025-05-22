@@ -17,7 +17,35 @@ public class IncludeInfoList<T, TProperty>(
     private Expression<Func<TProperty, bool>>? Filter { get; set; } = filter;
     public int? Take { get; set; }
     public int? Skip { get; set; }
-    public IOrderInfo<T>? OrderInfo { get; set; }
+    public IOrderInfo<TProperty>? OrderInfo { get; set; }
+    
+    public IncludeInfoList<T, TProperty> SetFilter(
+        Expression<Func<TProperty, bool>>? filter)
+    {
+        Filter = filter;
+        return this;
+    }
+    
+    public IncludeInfoList<T, TProperty> SetOrder<TPropertyProperty>(Expression<Func<TProperty, TPropertyProperty>> property, OrderInfoDirections direction = OrderInfoDirections.Asc)
+    {
+        OrderInfo = new OrderInfo<TProperty,TPropertyProperty>(property, direction);
+        return this;
+    }
+    
+    public IncludeInfoList<T, TProperty> SetOrderDesc<TPropertyProperty>(Expression<Func<TProperty, TPropertyProperty>> property)
+        => SetOrder(property, OrderInfoDirections.Desc);
+    
+    public IncludeInfoList<T, TProperty> SetTake(int? take)
+    {
+        Take = take;
+        return this;
+    }
+    
+    public IncludeInfoList<T, TProperty> SetSkip(int? skip)
+    {
+        Skip = skip;
+        return this;
+    }
 
     public IQueryable<T> ToQueryable(IQueryable<T> source)
     {
@@ -45,7 +73,7 @@ public class IncludeInfoList<T, TProperty>(
         if (Skip.GetValueOrDefault(0) > 0)
         {
             var method = typeof(Enumerable).GetMethod("Skip")!.MakeGenericMethod(paramType);
-            selector = Expression.Call(method, selector, Expression.Constant(Skip.Value));
+            selector = Expression.Call(method, selector, Expression.Constant(Skip));
         }
         if (Take.GetValueOrDefault(0) > 0)
         {
@@ -54,7 +82,7 @@ public class IncludeInfoList<T, TProperty>(
             var method = typeof(Enumerable).GetMethod("Take", new[] { typeof(System.Collections.IEnumerable), typeof(int) });
             method ??= msTake.First();
             method = method.MakeGenericMethod(paramType);
-            selector = Expression.Call(method, selector, Expression.Constant(Take.Value));
+            selector = Expression.Call(method, selector, Expression.Constant(Take));
         }
         if (Filter is not null)
         {
@@ -71,6 +99,6 @@ public class IncludeInfoList<T, TProperty>(
 
         return ThenIncludes is null
             ? query
-            : ThenIncludes.ToQueryable(query!);
+            : ThenIncludes.ToQueryable(query);
     }
 }
