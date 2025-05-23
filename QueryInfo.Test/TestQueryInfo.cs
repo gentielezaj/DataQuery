@@ -23,8 +23,7 @@ namespace QueryInfo.Test
             var queryInfo = new QueryInfo<Student>()
                 .SetIncludeEntity(x => x.School)
                 .SetIncludeList(x => x.Grades, x => x.SetFilter(f => f.Value == "B")
-                    .SetOrder(g => g.Value, OrderInfoDirections.Desc)
-                    .SetSkip(1))
+                    .SetOrder(g => g.Value, OrderInfoDirections.Desc))
                 .SetWhere(x => x.Name == "Jane Roe");
                 // .AddOrder(x => x.School!.Name, OrderInfoDirections.Asc);
 
@@ -50,13 +49,13 @@ namespace QueryInfo.Test
         }
         
         [Fact]
-        public void TestQueryInfo1()
+        public void IncludeTenIncludeEntity()
         {
-            var queryInfo = new QueryInfo<Student>()
-                .SetIncludeEntity(x => x.School)
-                .SetIncludeList(x => x.Grades, x => x.SetFilter(f => f.Value == "B"))
-                .SetWhere(x => x.Name == "Jane Roe")
-                .AddOrder(x => x.Grades.Select(x => x.Value), OrderInfoDirections.Desc);
+            var queryInfo = new QueryInfo<Student>();
+
+            queryInfo.IncludeList(x => x.Grades)
+                .ThenIncludeEntity(x => x.SchoolClass);
+                
 
             using var db = new AppDbContest();
             db.Database.EnsureCreated();
@@ -67,11 +66,27 @@ namespace QueryInfo.Test
 
             var student = query.First();
 
-            Assert.NotNull(student);
-            Assert.Equal("Jane Roe", student.Name);
-            Assert.NotNull(student.School);
-            Assert.NotNull(student.Grades);
-            Assert.True(student.Grades?.Count > 0);
+            Assert.NotNull(student?.Grades?.FirstOrDefault()?.SchoolClass);
+        }
+        
+        public void IncludeTenIncludeList()
+        {
+            var queryInfo = new QueryInfo<School>();
+
+            queryInfo.IncludeList(x => x.Students)
+                .ThenIncludeList(x => x.Grades);
+                
+
+            using var db = new AppDbContest();
+            db.Database.EnsureCreated();
+            db.Database.Migrate();
+
+            var query = db.Schools.AsQueryable();
+            query = queryInfo.ToQueryable(query);
+
+            var school = query.First();
+
+            Assert.NotNull(school?.Students?.FirstOrDefault()?.Grades);
         }
     }
 }

@@ -66,7 +66,7 @@ public class ThenIncludeInfoList<TPreviousProperty, TNextProperty>(
 
     public IQueryable<TSource> ToQueryable<TSource>(IQueryable<TSource> source)
     {
-        var rootType = typeof(TNextProperty);
+        var rootType = typeof(TPreviousProperty);
         var expression = source.Expression;
 
         var property = GetPropertyInfo();

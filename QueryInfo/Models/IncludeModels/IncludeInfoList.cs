@@ -52,7 +52,11 @@ public class IncludeInfoList<T, TProperty>(
     {
         if (Filter is null && !Take.HasValue && !Skip.HasValue)
         {
-            return source.Include(Navigation);
+            var queryNavigation = source.Include(Navigation);
+            
+            return ThenIncludes is null
+                ? queryNavigation
+                : ThenIncludes.ToQueryable(queryNavigation);
         }
 
         // For now EF core dose not support include filter as variable, so we need to do it manually
