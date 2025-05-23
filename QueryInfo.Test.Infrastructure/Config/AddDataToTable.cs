@@ -36,9 +36,9 @@ internal class AddDataToTable
             new Grade { Id = 1, Value = "A", StudentId = 1, SchoolClassId = 1 },
             new Grade { Id = 2, Value = "B", StudentId = 2, SchoolClassId = 1 },
             new Grade { Id = 3, Value = "C", StudentId = 3, SchoolClassId = 1 },
-            new Grade { Id = 4, Value = "A", StudentId = 1, SchoolClassId = 2 },
-            new Grade { Id = 5, Value = "B", StudentId = 2, SchoolClassId = 2 },
-            new Grade { Id = 6, Value = "C", StudentId = 3, SchoolClassId = 2 }
+            new Grade { Id = 4, Value = "D", StudentId = 1, SchoolClassId = 2 },
+            new Grade { Id = 5, Value = "F", StudentId = 2, SchoolClassId = 2 },
+            new Grade { Id = 6, Value = "G", StudentId = 3, SchoolClassId = 2 }
         );
     }
 }

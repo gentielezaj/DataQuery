@@ -12,13 +12,20 @@ namespace QueryInfo.Test
         {
             var queryInfo = new QueryInfo<Student>()
                 .SetIncludeEntity(x => x.School)
-                .SetIncludeList(x => x.Grades, x => x.SetFilter(f => f.Value == "B"))
-                .SetWhere(x => x.Name == "Jane Roe")
-                .AddOrder(x => x.School!.Name, OrderInfoDirections.Asc);
+                .SetIncludeList(x => x.Grades, x => x.SetFilter(f => f.Value == "B")
+                    .SetOrder(g => g.Value, OrderInfoDirections.Desc)
+                    .SetSkip(1))
+                .SetWhere(x => x.Name == "Jane Roe");
+                // .AddOrder(x => x.School!.Name, OrderInfoDirections.Asc);
 
             using var db = new AppDbContest();
             db.Database.EnsureCreated();
             db.Database.Migrate();
+
+
+            var students = db.Students
+                .Include(x => x.Grades.OrderByDescending(g => g.Value))
+                .ToList();
 
             var query = db.Students.AsQueryable();
             query = queryInfo.ToQueryable(query);
@@ -39,7 +46,7 @@ namespace QueryInfo.Test
                 .SetIncludeEntity(x => x.School)
                 .SetIncludeList(x => x.Grades, x => x.SetFilter(f => f.Value == "B"))
                 .SetWhere(x => x.Name == "Jane Roe")
-                .AddOrder(x => x.Grades.Sum(s => s.Id), OrderInfoDirections.Asc);
+                .AddOrder(x => x.Grades.Select(x => x.Value), OrderInfoDirections.Desc);
 
             using var db = new AppDbContest();
             db.Database.EnsureCreated();

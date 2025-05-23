@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
+using QueryInfo.Utilities;
 
 namespace QueryInfo.Models.IncludeModels;
 
@@ -66,9 +67,26 @@ public class IncludeInfoList<T, TProperty>(
         var paramType = selector.Type.GetGenericArguments()[0];
         if (OrderInfo is not null)
         {
-            var orderExpression = OrderInfo.ToExpression(selector);
-            if (orderExpression is not null)
-                selector = orderExpression;
+            var orderInfos = OrderInfo.GetOrderAsList();
+            var count = 0;
+            foreach (var item in orderInfos)
+            {
+                var orderParameter = Expression.Parameter(typeof(TProperty), "x");
+                Expression orderSelector = ExpressionUtils.BuildSelector(orderParameter, item.LambdaSelector.Body);
+
+                var methodName = Equals(item.Direction, OrderInfoDirections.Desc)
+                    ? (count == 0 ? "OrderByDescending" : "ThenByDescending")
+                    : (count == 0 ? "OrderBy" : "ThenBy");
+
+                selector = Expression.Call(typeof(Enumerable), methodName,
+                    [paramType, orderSelector.Type],
+                    selector, Expression.Lambda(orderSelector, orderParameter));
+                count++;
+            }
+
+            // var orderExpression = OrderInfo.ToExpression(selector);
+            // if (orderExpression is not null)
+            //     selector = orderExpression;
         }
         if (Skip.GetValueOrDefault(0) > 0)
         {

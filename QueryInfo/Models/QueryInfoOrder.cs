@@ -102,7 +102,7 @@ public class OrderInfo<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> 
         foreach (var item in orderInfos)
         {
             var parameter = Expression.Parameter(typeof(TEntity), "x");
-            Expression selector = GetSecector(parameter, item.LambdaSelector);
+            Expression selector = ExpressionUtils.BuildSelector(parameter, LambdaSelector.Body);
 
             var methodName = Equals(item.Direction, OrderInfoDirections.Desc)
                 ? (count == 0 ? "OrderByDescending" : "ThenByDescending")
@@ -156,22 +156,69 @@ public class OrderInfo<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> 
     {
         Expression? expr = selector.Body;
 
-        if (expr is MemberExpression memberExpr)
+        return BuildSelector(paramerter, expr);
+        
+        // if (expr is MemberExpression memberExpr)
+        // {
+        //    return GetSecector(paramerter, memberExpr); 
+        // }
+        //
+        // if (expr is UnaryExpression unaryExpr && unaryExpr.Operand is MemberExpression member)
+        // {
+        //     return GetSecector(paramerter, member); 
+        // }
+        //
+        // if (expr is MethodCallExpression methodCallExpr)
+        // {
+        //     return GetSecectorMethod(paramerter, methodCallExpr);
+        // }
+        //
+        // return expr;
+    }
+    
+    public static Expression BuildSelector(Expression parameter, Expression body)
+    {
+        if (body is MemberExpression memberExpr)
         {
-           return GetSecector(paramerter, memberExpr); 
+            var inner = BuildSelector(parameter, memberExpr.Expression ?? parameter);
+            return Expression.PropertyOrField(inner, memberExpr.Member.Name);
         }
-
-        if (expr is UnaryExpression unaryExpr && unaryExpr.Operand is MemberExpression member)
+        if (body is MethodCallExpression methodCall)
         {
-            return GetSecector(paramerter, member); 
-        }
+            var args = new List<Expression>();
 
-        if (expr is MethodCallExpression methodCallExpr)
+            foreach (var arg in methodCall.Arguments)
+            {
+                if (arg is LambdaExpression lambda)
+                {
+                    var inner = BuildSelector(parameter, lambda.Body);
+                    var lambdaExpression = Expression.Lambda(inner, lambda.Parameters);
+                    var quoteExpression = Expression.Quote(lambdaExpression);
+                    args.Add(quoteExpression);
+                }
+                else
+                {
+                    var innerBody = BuildSelector(parameter, arg);
+                    args.Add(innerBody);
+                }
+            }
+            
+            var method = methodCall.Method.IsGenericMethod
+                ? methodCall.Method.GetGenericMethodDefinition().MakeGenericMethod(methodCall.Method.GetGenericArguments())
+                : methodCall.Method;
+
+            var instance = methodCall.Object != null ? BuildSelector(parameter, methodCall.Object) : null;
+            return Expression.Call(instance, method, args);
+        }
+        if (body is ParameterExpression)
         {
-            return GetSecectorMethod(paramerter, methodCallExpr);
+            return parameter;
         }
-
-        return expr;
+        if (body is UnaryExpression unary)
+        {
+            return BuildSelector(parameter, unary.Operand);
+        }
+        throw new NotSupportedException($"Unsupported expression type: {body.GetType().Name}");
     }
     
     private static Expression GetSecector(Expression paramerter, MemberExpression selector)
