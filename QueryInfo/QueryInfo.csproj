@@ -4,6 +4,14 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Version>0.0.2</Version>
+    <Title>QueryInfo</Title>
+    <Authors>Genti Elezaj</Authors>
+    <Description>Create query without IQuerable, than translate it tu i querable</Description>
+    <PackageProjectUrl>https://github.com/gentielezaj/QueryInfo</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gentielezaj/QueryInfo</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>shlabs.queryinfo</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

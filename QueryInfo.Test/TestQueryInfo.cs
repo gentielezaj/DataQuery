@@ -7,6 +7,16 @@ namespace QueryInfo.Test
 {
     public class TestQueryInfo : CoreUnitTest
     {
+
+        [Fact]
+        public void DynamicOrderToTypedOrder()
+        {
+            var order = new OrderInfo(nameof(Student.Name), OrderInfoDirections.Desc);
+            var typedOrder = order.ToOrderInfo<Student>();
+
+            Assert.NotNull(typedOrder);
+        }
+        
         [Fact]
         public void TestOrderGradId()
         {

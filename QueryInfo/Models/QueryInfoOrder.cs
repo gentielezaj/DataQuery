@@ -151,32 +151,8 @@ public class OrderInfo<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> 
 
         return orderedQueryable;
     }
-
-    private static Expression GetSecector(Expression paramerter, LambdaExpression selector)
-    {
-        Expression? expr = selector.Body;
-
-        return BuildSelector(paramerter, expr);
-        
-        // if (expr is MemberExpression memberExpr)
-        // {
-        //    return GetSecector(paramerter, memberExpr); 
-        // }
-        //
-        // if (expr is UnaryExpression unaryExpr && unaryExpr.Operand is MemberExpression member)
-        // {
-        //     return GetSecector(paramerter, member); 
-        // }
-        //
-        // if (expr is MethodCallExpression methodCallExpr)
-        // {
-        //     return GetSecectorMethod(paramerter, methodCallExpr);
-        // }
-        //
-        // return expr;
-    }
     
-    public static Expression BuildSelector(Expression parameter, Expression body)
+    private static Expression BuildSelector(Expression parameter, Expression body)
     {
         if (body is MemberExpression memberExpr)
         {
@@ -220,68 +196,6 @@ public class OrderInfo<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> 
         }
         throw new NotSupportedException($"Unsupported expression type: {body.GetType().Name}");
     }
-    
-    private static Expression GetSecector(Expression paramerter, MemberExpression selector)
-    {
-        if (selector.Expression is MemberExpression memberExpr)
-        {
-            paramerter = GetSecector(paramerter, memberExpr);
-        }
-        
-        return Expression.PropertyOrField(paramerter, selector.Member.Name);
-    }
-
-    public static Expression GetSecectorMethod(Expression parameter, MethodCallExpression methodCallExpr)
-    {
-        var parentType = methodCallExpr.Method.GetGenericArguments()[0];
-        parentType = parentType.GetGenericArguments().Any() ? parentType.GetGenericArguments()[0] : parentType;
-
-        var methods = typeof(Enumerable).GetMethods()
-            .Where(m => m.Name == methodCallExpr.Method.Name &&
-                        m.GetParameters().Length == methodCallExpr.Method.GetParameters().Length
-                        && m.GetGenericArguments().Length == methodCallExpr.Method.GetGenericArguments().Length);
-        
-        var method = methods
-            .First(x =>
-            {
-                if (x.IsGenericMethod)
-                {
-                    x = x.MakeGenericMethod(methodCallExpr.Method.GetGenericArguments());
-                }
-                
-                var parameters = x.GetParameters();
-                var callerParameters = methodCallExpr.Method.GetParameters();
-
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    if (parameters[i].ParameterType != callerParameters[i].ParameterType 
-                        && !callerParameters[i].ParameterType.IsAssignableFrom(parameters[i].ParameterType))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }).MakeGenericMethod(parentType);
-        
-        var methodCallExprArguments = methodCallExpr.Arguments;
-        if (methodCallExprArguments.Count == 1)
-        {
-            return Expression.Call(null, method, parameter);
-        }
-
-        if (methodCallExprArguments.Count != 2)
-        {
-            throw new ArgumentException("Method is not supported yet, ", nameof(method.Name));
-        }
-        
-        var chaildParameterName = "x" + Guid.NewGuid().ToString("N").ToLowerInvariant();
-        var childParameter = Expression.Parameter(parentType, chaildParameterName);
-        
-        var childSelector = GetSecector(childParameter, (LambdaExpression)methodCallExprArguments[1]);
-        var childLambda = Expression.Lambda(childSelector, childParameter);
-        return Expression.Call(null, method, parameter, Expression.Quote(childLambda));
-    }
 }
 
 public class OrderInfo(string field, OrderInfoDirections direction)
@@ -293,7 +207,6 @@ public class OrderInfo(string field, OrderInfoDirections direction)
 
     public OrderInfoDirections Direction { get; set; } = direction;
     public string Field { get; set; } = field;
-
     public static OrderInfo Asc(string field, params string[] fields)
     {
         var orderField = fields.Aggregate(field, (current, f) => current + $".{f}");
@@ -304,6 +217,48 @@ public class OrderInfo(string field, OrderInfoDirections direction)
     {
         var orderField = fields.Aggregate(field, (current, f) => current + $".{f}");
         return new OrderInfo(orderField, OrderInfoDirections.Desc);
+    }
+
+    public IOrderInfo<TEntity> ToOrderInfo<TEntity>()
+    {
+        var parameter = Expression.Parameter(typeof(TEntity), "x");
+        var selection = Expression.PropertyOrField(parameter, Field);
+    
+        // Create a generic lambda with dynamic property type
+        var propertyType = selection.Type;
+        var funcType = typeof(Func<,>).MakeGenericType(typeof(TEntity), propertyType);
+        
+        // Use the specific Lambda method that takes Type parameter to avoid ambiguity
+        var lambdaMethod = typeof(Expression).GetMethods()
+            .Where(m => m.Name == "Lambda" && m.IsGenericMethod && m.GetParameters().Length == 2)
+            .First(m => m.GetParameters()[0].ParameterType == typeof(Expression) && 
+                        m.GetParameters()[1].ParameterType == typeof(ParameterExpression[]));
+        
+        var genericLambdaMethod = lambdaMethod.MakeGenericMethod(funcType);
+        var lambda = genericLambdaMethod.Invoke(null, new object[] { selection, new[] { parameter } });
+    
+        // Create the OrderInfo with reflection since we don't know TProperty at compile time
+        var orderInfoType = typeof(OrderInfo<,>).MakeGenericType(typeof(TEntity), propertyType);
+        return (IOrderInfo<TEntity>)Activator.CreateInstance(orderInfoType, lambda, Direction);
+    }
+    
+    public static IOrderInfo<TEntity>? ToOrderInfo<TEntity>(IEnumerable<OrderInfo> orders)
+    {
+        if (orders.Any() != true)
+        {
+            return null;
+        }
+        
+        var orderOrder = new Queue<OrderInfo>(orders);
+        var orderInfo = orderOrder.Dequeue().ToOrderInfo<TEntity>();
+
+        while (orderOrder.Any())
+        {
+            var order = orderOrder.Dequeue().ToOrderInfo<TEntity>();
+            orderInfo.AddOrderBy(order);
+        }
+
+        return orderInfo;
     }
 }
 
