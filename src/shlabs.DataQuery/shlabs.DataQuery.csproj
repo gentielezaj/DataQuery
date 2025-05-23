@@ -4,6 +4,12 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>DataQuery</Title>
+        <PackageProjectUrl>https://github.com/gentielezaj/DataQuery</PackageProjectUrl>
+        <PackageLicenseUrl>MIT</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/gentielezaj/DataQuery</RepositoryUrl>
+        <Version>0.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
