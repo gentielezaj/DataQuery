@@ -1,17 +1,14 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Microsoft.EntityFrameworkCore;
-using QueryInfo.Test.Infrastructure.Model;
 using shabs.DataQuery.Abstractions;
 using shlabs.DataQuery.Example.Infrastructure;
+using shlabs.DataQuery.Example.Infrastructure.Models;
 
 Console.WriteLine("Hello, World!");
 
-var dbPath = "E:\\db\\QueryBuilder.db";
-
-var db = new AppDbContext(dbPath);
-
-Directory.CreateDirectory("E:\\db");
+SetUp.SetupDatabase();
+using var db = new AppDbContext(SetUp.DbPath);
 
 // db.Database.EnsureCreated();
 db.Database.Migrate();

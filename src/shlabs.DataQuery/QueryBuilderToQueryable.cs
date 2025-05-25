@@ -1,9 +1,29 @@
+using Microsoft.EntityFrameworkCore;
 using shabs.DataQuery.Abstractions;
 
 namespace System.Linq;
 
 public static class QueryBuilderToQueryable
 {
+    public static IQueryable<T> ToQueryable<T>(this QueryBuilder<T> builder, DbContext dbContext)
+        where T : class
+    {
+        if (dbContext is null)
+        {
+            throw new ArgumentNullException(nameof(dbContext));
+        }
+
+        var dbSet = dbContext.Set<T>();
+        return ToQueryable(builder, dbSet);
+    }
+    
+    public static IQueryable<T> ToQueryable<T>(this QueryBuilder<T> builder, DbSet<T> dbSet)
+        where T : class
+    {
+        var query = dbSet.AsQueryable();
+        return ToQueryable(builder, query);
+    }
+    
     public static IQueryable<T> ToQueryable<T>(this QueryBuilder<T> builder, IQueryable<T> query) 
         where T : class
     {

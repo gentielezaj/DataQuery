@@ -1,9 +1,8 @@
-using QueryInfo.Test.Infrastructure.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QueryInfo.Test.Infrastructure.Model
+namespace shlabs.DataQuery.Example.Infrastructure.Models
 {
     public class SchoolClass : IdNameSchoolEntity
     {

@@ -1,7 +1,6 @@
-using QueryInfo.Test.Infrastructure.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QueryInfo.Test.Infrastructure.Model
+namespace shlabs.DataQuery.Example.Infrastructure.Models
 {
     public class Grade : IdEntity
     {

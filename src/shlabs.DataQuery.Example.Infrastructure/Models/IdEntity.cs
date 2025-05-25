@@ -1,8 +1,7 @@
-﻿using QueryInfo.Test.Infrastructure.Model;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QueryInfo.Test.Infrastructure.Models
+namespace shlabs.DataQuery.Example.Infrastructure.Models
 {
     public abstract class IdEntity
     {

@@ -11,6 +11,7 @@
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/gentielezaj/DataQuery</RepositoryUrl>
         <RepositoryType>https://github.com/gentielezaj/DataQuery</RepositoryType>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
 </Project>

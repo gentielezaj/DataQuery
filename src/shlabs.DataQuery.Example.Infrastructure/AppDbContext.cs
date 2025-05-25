@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using QueryInfo.Test.Infrastructure.Model;
+using shlabs.DataQuery.Example.Infrastructure.Models;
 using shlabs.DataQuery.Example.Infrastructure.Config;
 
 namespace shlabs.DataQuery.Example.Infrastructure;

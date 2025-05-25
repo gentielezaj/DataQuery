@@ -1,6 +1,4 @@
-using QueryInfo.Test.Infrastructure.Models;
-
-namespace QueryInfo.Test.Infrastructure.Model
+namespace shlabs.DataQuery.Example.Infrastructure.Models
 {
     public class Teacher : IdNameSchoolEntity
     {
