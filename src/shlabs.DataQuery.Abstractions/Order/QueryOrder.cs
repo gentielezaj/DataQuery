@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace shabs.DataQuery.Abstractions;
+namespace shlabs.DataQuery.Abstractions;
 
 public class QueryOrder<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> selector, QueryOrderDirections direction)
     : IQueryOrder<TEntity>

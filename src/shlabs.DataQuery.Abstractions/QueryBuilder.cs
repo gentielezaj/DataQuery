@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Linq.Expressions;
 
-namespace shabs.DataQuery.Abstractions;
+namespace shlabs.DataQuery.Abstractions;
 
 public class QueryBuilder<TEntity> : CoreQueryBuilder
     where TEntity : class

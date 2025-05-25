@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace shabs.DataQuery.Abstractions.Dynamic;
+namespace shlabs.DataQuery.Abstractions.Dynamic;
 
 public class QueryBuilder : CoreQueryBuilder
 {

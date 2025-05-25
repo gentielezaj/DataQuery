@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Microsoft.EntityFrameworkCore;
-using shabs.DataQuery.Abstractions;
+using shlabs.DataQuery.Abstractions;
 using shlabs.DataQuery.Example.Infrastructure;
 using shlabs.DataQuery.Example.Infrastructure.Models;
 

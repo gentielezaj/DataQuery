@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace shabs.DataQuery.Abstractions.Utilities;
+namespace shlabs.DataQuery.Abstractions.Utilities;
 
 internal class ExpressionUtils
 {

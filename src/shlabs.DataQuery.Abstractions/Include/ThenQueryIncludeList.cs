@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace shabs.DataQuery.Abstractions;
+namespace shlabs.DataQuery.Abstractions;
 
 public interface IThenQueryIncludeList<TPreviousProperty> : IThenQueryInclude<TPreviousProperty>
     where TPreviousProperty : class;

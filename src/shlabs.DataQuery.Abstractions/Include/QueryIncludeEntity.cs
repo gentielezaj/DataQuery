@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace shabs.DataQuery.Abstractions;
+namespace shlabs.DataQuery.Abstractions;
 
 public interface IQueryIncludeEntity<TEntity> : IQueryInclude<TEntity>
     where TEntity : class;

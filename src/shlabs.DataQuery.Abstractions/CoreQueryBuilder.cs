@@ -1,4 +1,4 @@
-namespace shabs.DataQuery.Abstractions;
+namespace shlabs.DataQuery.Abstractions;
 
 public abstract class CoreQueryBuilder : IQueryBuilder
 {

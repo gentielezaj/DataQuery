@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace shabs.DataQuery.Abstractions;
+namespace shlabs.DataQuery.Abstractions;
 
 public abstract class CoreQueryIncludeList<TEntity, TProperty>(
     Expression<Func<TEntity, IEnumerable<TProperty>?>> navigation,

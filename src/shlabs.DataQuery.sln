@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E69CA046-1230-4C1B-887F-CE45C162B939}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shabs.DataQuery.Abstractions", "shabs.DataQuery.Abstractions\shabs.DataQuery.Abstractions.csproj", "{7178DBC0-EE6F-43BD-AFC7-5BEA2A3966E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shlabs.DataQuery.Abstractions", "shlabs.DataQuery.Abstractions\shlabs.DataQuery.Abstractions.csproj", "{7178DBC0-EE6F-43BD-AFC7-5BEA2A3966E3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{486D0F84-B6ED-4D7B-95E8-E17BCF0E3374}"
 EndProject

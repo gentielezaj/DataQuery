@@ -1,9 +1,8 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using shabs.DataQuery.Abstractions;
-using shabs.DataQuery.Abstractions.Utilities;
+using shlabs.DataQuery.Abstractions;
+using shlabs.DataQuery.Abstractions.Utilities;
 
 namespace System.Linq;
 

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace shabs.DataQuery.Abstractions;
+namespace shlabs.DataQuery.Abstractions;
 
 public enum QueryOrderDirections
 {

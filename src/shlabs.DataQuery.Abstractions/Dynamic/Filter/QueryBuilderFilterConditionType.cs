@@ -1,4 +1,4 @@
-namespace shabs.DataQuery.Abstractions.Dynamic;
+namespace shlabs.DataQuery.Abstractions.Dynamic;
 
 public enum QueryBuilderCriteriaConditions
 {

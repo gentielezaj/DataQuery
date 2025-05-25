@@ -15,7 +15,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\shabs.DataQuery.Abstractions\shabs.DataQuery.Abstractions.csproj" />
+      <ProjectReference Include="..\shlabs.DataQuery.Abstractions\shlabs.DataQuery.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup>

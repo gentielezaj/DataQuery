@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using shabs.DataQuery.Abstractions;
+using shlabs.DataQuery.Abstractions;
 using shlabs.DataQuery.Example.Infrastructure.Models;
 
 namespace shlabs.DataQuery.Test;

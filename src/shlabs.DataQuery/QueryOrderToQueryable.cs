@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using shabs.DataQuery.Abstractions;
-using shabs.DataQuery.Abstractions.Utilities;
+using shlabs.DataQuery.Abstractions.Utilities;
+using shlabs.DataQuery.Abstractions;
 
 namespace System.Linq;
 

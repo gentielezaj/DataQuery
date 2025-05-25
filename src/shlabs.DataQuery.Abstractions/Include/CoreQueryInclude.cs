@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Linq.Expressions;
 
-namespace shabs.DataQuery.Abstractions;
+namespace shlabs.DataQuery.Abstractions;
 
 public abstract class CoreQueryInclude<TEntity, TProperty, TPropertyUnderlying>(
     Expression<Func<TEntity, TProperty?>> navigation,
