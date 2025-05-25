@@ -7,9 +7,12 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>DataQuery</Title>
         <PackageProjectUrl>https://github.com/gentielezaj/DataQuery</PackageProjectUrl>
-        <PackageLicenseUrl>MIT</PackageLicenseUrl>
+        <PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/gentielezaj/DataQuery</RepositoryUrl>
         <Version>0.0.1</Version>
+        <Description>Translaties query builder to querable</Description>
+        <PackageReleaseNotes>Added query builder exutor</PackageReleaseNotes>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>

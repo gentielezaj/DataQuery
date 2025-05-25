@@ -8,10 +8,13 @@
         <Title>DataQuery abstractions</Title>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageProjectUrl>https://github.com/gentielezaj/DataQuery</PackageProjectUrl>
-        <PackageLicenseUrl>MIT</PackageLicenseUrl>
+        <PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/gentielezaj/DataQuery</RepositoryUrl>
         <RepositoryType>https://github.com/gentielezaj/DataQuery</RepositoryType>
         <IsPackable>true</IsPackable>
+        <Description>This contains only builder model not traslation</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>Added query builder</PackageReleaseNotes>
     </PropertyGroup>
 
 </Project>
