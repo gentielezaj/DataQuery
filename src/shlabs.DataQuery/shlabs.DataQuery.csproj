@@ -12,7 +12,6 @@
         <Version>0.0.1</Version>
         <Description>Translaties query builder to querable</Description>
         <PackageReleaseNotes>Added query builder exutor</PackageReleaseNotes>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
