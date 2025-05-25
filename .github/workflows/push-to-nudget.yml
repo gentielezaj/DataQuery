@@ -63,7 +63,7 @@ jobs:
         # '-o nupkg' specifies the output directory for the .nupkg file.
         # '/p:Version=${{ steps.get_version.outputs.version }}' overrides the package version
         # with the one extracted from the Git tag.
-        run: dotnet pack --configuration Release --no-build --no-restore -o nupkg /p:Version=${{ steps.get_version.outputs.version }}
+        run: dotnet pack --configuration Release --no-build --no-restore -o nupkg /p:Version=0.0.2
 
       - name: Publish NuGet package
         # Pushes the generated NuGet package to nuget.org.
@@ -124,7 +124,7 @@ jobs:
         # '-o nupkg' specifies the output directory for the .nupkg file.
         # '/p:Version=${{ steps.get_version.outputs.version }}' overrides the package version
         # with the one extracted from the Git tag.
-        run: dotnet pack --configuration Release --no-build --no-restore -o nupkg /p:Version=${{ steps.get_version.outputs.version }}
+        run: dotnet pack --configuration Release --no-build --no-restore -o nupkg /p:Version=0.0.2
 
       - name: Publish NuGet package
         # Pushes the generated NuGet package to nuget.org.
