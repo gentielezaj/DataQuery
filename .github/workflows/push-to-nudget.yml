@@ -4,8 +4,10 @@ name: Publish NuGet on Tag
 # Defines when the workflow runs
 on:
   push:
-    tags:
-      - 'v*' # This workflow will run whenever a new tag starting with 'v' is pushed (e.g., v1.0.0, v2.1.5-beta)
+#    tags:
+#      - 'v*' # This workflow will run whenever a new tag starting with 'v' is pushed (e.g., v1.0.0, v2.1.5-beta)
+    branches:
+      - 'master'
 
 # Permissions required for the workflow
 permissions:
@@ -14,9 +16,14 @@ permissions:
 
 # Defines the jobs that run in this workflow
 jobs:
-  publish:
+  publish-abstractions:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    
+    # Set the default working directory for all steps in this job
+    defaults:
+      run:
+        working-directory: src/shabs.DataQuery.Abstractions # Path relative to the root of your repository
 
     # Steps in the job
     steps:
@@ -67,3 +74,63 @@ jobs:
         env:
           # Ensure the NUGET_API_KEY is available as an environment variable for the 'dotnet nuget push' command.
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+  publish-implementation:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Set the default working directory for all steps in this job
+    defaults:
+      run:
+        working-directory: src/shabs.DataQuery # Path relative to the root of your repository
+
+    # Steps in the job
+    steps:
+      - name: Checkout repository
+        # Uses the official GitHub action to checkout your repository code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        # Uses the official GitHub action to set up the .NET environment
+        uses: actions/setup-dotnet@v4
+        with:
+          # Specify the .NET SDK version you need. Change '8.x' to your project's target framework (e.g., '6.0.x', '7.0.x').
+          dotnet-version: '8.x'
+
+      - name: Get version from tag
+        # This step extracts the version number from the Git tag.
+        # For example, if the tag is 'v1.2.3', it sets the 'version' output to '1.2.3'.
+        id: get_version
+        run: |
+          # GITHUB_REF_NAME contains the tag name (e.g., 'v1.2.3')
+          # The 'sed' command removes the leading 'v' character.
+          # The result is then outputted as a step output named 'version'.
+          echo "version=$(echo ${{ github.ref_name }} | sed 's/^v//')" >> $GITHUB_OUTPUT
+
+      - name: Restore dependencies
+        # Restores NuGet packages for your project
+        run: dotnet restore
+
+      - name: Build project
+        # Builds your .NET project in Release configuration.
+        # '--no-restore' prevents re-restoring packages as they were already restored in the previous step.
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Pack NuGet package
+        # Creates the NuGet package (.nupkg file).
+        # '--no-build' and '--no-restore' prevent re-building and re-restoring, as they've already been done.
+        # '-o nupkg' specifies the output directory for the .nupkg file.
+        # '/p:Version=${{ steps.get_version.outputs.version }}' overrides the package version
+        # with the one extracted from the Git tag.
+        run: dotnet pack --configuration Release --no-build --no-restore -o nupkg /p:Version=${{ steps.get_version.outputs.version }}
+
+      - name: Publish NuGet package
+        # Pushes the generated NuGet package to nuget.org.
+        # 'nupkg/*.nupkg' targets the .nupkg file in the 'nupkg' directory.
+        # '--api-key ${{ secrets.NUGET_API_KEY }}' uses a GitHub secret for authentication.
+        # '--source https://api.nuget.org/v3/index.json' specifies the NuGet public feed.
+        run: dotnet nuget push nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        env:
+          # Ensure the NUGET_API_KEY is available as an environment variable for the 'dotnet nuget push' command.
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    
