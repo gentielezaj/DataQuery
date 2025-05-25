@@ -40,7 +40,7 @@ public static class QueryIncludeToQueryable
         var include = query.Include(queryInclude.Navigation);
         return queryInclude.ThenIncludes is null
             ? include
-            : ThenToQueryable<T, TProperty>(queryInclude.ThenIncludes!, query);
+            : ThenToQueryable<T, TProperty>(queryInclude.ThenIncludes!, include);
     }
     
     private static IQueryable<T> ToQueryableList<T, TProperty>(QueryIncludeList<T, TProperty> queryInclude, IQueryable<T> source)
