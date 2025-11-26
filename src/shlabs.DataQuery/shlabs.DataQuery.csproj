@@ -9,9 +9,10 @@
         <PackageProjectUrl>https://github.com/gentielezaj/DataQuery</PackageProjectUrl>
         <PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/gentielezaj/DataQuery</RepositoryUrl>
-        <Version>0.0.1</Version>
+        <Version>0.0.6</Version>
         <Description>Translaties query builder to querable</Description>
         <PackageReleaseNotes>Added query builder exutor</PackageReleaseNotes>
+        <NeutralLanguage>en</NeutralLanguage>
     </PropertyGroup>
 
     <ItemGroup>

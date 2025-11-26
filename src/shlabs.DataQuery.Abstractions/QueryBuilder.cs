@@ -1,5 +1,8 @@
+using shlabs.DataQuery.Abstractions.Dynamic;
+using shlabs.DataQuery.Abstractions.Utils;
 using System.Collections;
 using System.Linq.Expressions;
+using static shlabs.DataQuery.Abstractions.Dynamic.QueryBuilderFilter;
 
 namespace shlabs.DataQuery.Abstractions;
 
@@ -127,6 +130,26 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
     }
 
     #endregion
+
+    public QueryBuilder<TEntity> AppendFilter(Expression<Func<TEntity, bool>> filter, Conditions condition = Conditions.And)
+    {
+        if (Filter is null)
+        {
+            Filter = filter;
+        }
+        else
+        {
+            if (condition == Conditions.And)
+            {
+                Filter = Filter.And(filter);
+            }
+            else
+            {
+                Filter = Filter.Or(filter);
+            }
+        }
+        return this;
+    }
 
     public QueryBuilder<TEntity> SetTake(int? take)
     {

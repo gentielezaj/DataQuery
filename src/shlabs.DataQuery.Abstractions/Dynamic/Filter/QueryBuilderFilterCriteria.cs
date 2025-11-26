@@ -20,7 +20,7 @@ public class QueryBuilderFilterCriteria(
     public override Expression<Func<T, bool>> ToQueryBuilderFilter<T>()
     {
         var parameter = Expression.Parameter(typeof(T), "x");
-        var member = Expression.Property(parameter, Field);
+        var member = GetNestedProperty(parameter, Field);
         var constant = Expression.Constant(Convert.ChangeType(Value, member.Type));
 
         Expression body = Operator switch
@@ -41,5 +41,18 @@ public class QueryBuilderFilterCriteria(
         };
 
         return Expression.Lambda<Func<T, bool>>(body, parameter);
+    }
+
+    private static Expression GetNestedProperty(Expression parameter, string propertyPath)
+    {
+        var properties = propertyPath.Split('.');
+        Expression member = parameter;
+    
+        foreach (var property in properties)
+        {
+            member = Expression.Property(member, property);
+        }
+    
+        return member;
     }
 }
