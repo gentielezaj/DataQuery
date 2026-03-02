@@ -2,7 +2,9 @@ using System.Linq.Expressions;
 
 namespace shlabs.DataQuery.Abstractions;
 
-public interface IThenQueryIncludeList<TPreviousProperty> : IThenQueryInclude<TPreviousProperty>
+public interface IThenQueryIncludeList;
+
+public interface IThenQueryIncludeList<TPreviousProperty> : IThenQueryInclude<TPreviousProperty>, IThenQueryIncludeList
     where TPreviousProperty : class;
 
 public class ThenQueryIncludeList<TPreviousProperty, TNextProperty>(

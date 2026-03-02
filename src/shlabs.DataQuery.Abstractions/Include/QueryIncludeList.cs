@@ -2,7 +2,9 @@ using System.Linq.Expressions;
 
 namespace shlabs.DataQuery.Abstractions;
 
-public interface IQueryIncludeList<TEntity> : IQueryInclude<TEntity> 
+public interface IQueryIncludeList;
+
+public interface IQueryIncludeList<TEntity> : IQueryInclude<TEntity>, IQueryIncludeList 
     where TEntity : class;
 
 public class QueryIncludeList<TEntity, TProperty>(

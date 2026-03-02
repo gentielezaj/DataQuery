@@ -10,8 +10,8 @@ public abstract class CoreQueryInclude<TEntity, TProperty, TPropertyUnderlying>(
     where TPropertyUnderlying : class
 {
     public LambdaExpression NavigationLambdaExpression => Navigation;
-    public Expression<Func<TEntity, TProperty?>> Navigation { get; protected set; } = navigation;
-    public IThenQueryInclude<TPropertyUnderlying>? ThenIncludes { get; protected set; } = thenIncludes;
+    public Expression<Func<TEntity, TProperty?>> Navigation { get; set; } = navigation;
+    public IThenQueryInclude<TPropertyUnderlying>? ThenIncludes { get; set; } = thenIncludes;
    
     public ThenQueryIncludeList<TPropertyUnderlying, TNextProperty> ThenIncludeList<TNextProperty>(
         Expression<Func<TPropertyUnderlying, IEnumerable<TNextProperty>?>> navigation,

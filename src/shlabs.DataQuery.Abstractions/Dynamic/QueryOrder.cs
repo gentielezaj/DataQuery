@@ -23,14 +23,14 @@ public class QueryOrder(string field, QueryOrderDirections direction)
         return new QueryOrder(orderField, QueryOrderDirections.Desc);
     }
 
-    public IQueryOrder<TEntity> ToQueryOrder<TEntity>()
+    public IQueryOrder ToQueryOrder(Type type)
     {
-        var parameter = Expression.Parameter(typeof(TEntity), "x");
+        var parameter = Expression.Parameter(type, "x");
         var selection = Expression.PropertyOrField(parameter, Field);
     
         // Create a generic lambda with dynamic property type
         var propertyType = selection.Type;
-        var funcType = typeof(Func<,>).MakeGenericType(typeof(TEntity), propertyType);
+        var funcType = typeof(Func<,>).MakeGenericType(type, propertyType);
         
         // Use the specific Lambda method that takes Type parameter to avoid ambiguity
         var lambdaMethod = typeof(Expression).GetMethods()
@@ -42,8 +42,14 @@ public class QueryOrder(string field, QueryOrderDirections direction)
         var lambda = genericLambdaMethod.Invoke(null, new object[] { selection, new[] { parameter } });
     
         // Create the QueryOrder with reflection since we don't know TProperty at compile time
-        var orderInfoType = typeof(QueryOrder<,>).MakeGenericType(typeof(TEntity), propertyType);
-        return (IQueryOrder<TEntity>)Activator.CreateInstance(orderInfoType, lambda, Direction)!;
+        var orderInfoType = typeof(QueryOrder<,>).MakeGenericType(type, propertyType);
+        return (IQueryOrder)Activator.CreateInstance(orderInfoType, lambda, Direction)!;
+    }
+    
+    public IQueryOrder<TEntity> ToQueryOrder<TEntity>()
+    {
+        var order = ToQueryOrder(typeof(TEntity));
+        return (IQueryOrder<TEntity>)order;
     }
     
     public static IQueryOrder<TEntity>? ToQueryOrder<TEntity>(IEnumerable<QueryOrder> orders)

@@ -2,12 +2,15 @@ using System.Linq.Expressions;
 
 namespace shlabs.DataQuery.Abstractions;
 
-public interface IQueryOrder<TEntity>
+public interface IQueryOrder
 {
     LambdaExpression LambdaSelector { get; }
 
     QueryOrderDirections Direction { get; }
+}
 
+public interface IQueryOrder<TEntity> : IQueryOrder
+{
     IQueryOrder<TEntity>? ThenOrderBy { get; }
 
     IQueryOrder<TEntity> ThenBy(IQueryOrder<TEntity> thenBy);

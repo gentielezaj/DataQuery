@@ -15,7 +15,7 @@ A C# library for advanced, composable querying with Entity Framework Core using 
 
 ### Prerequisites
 
-- .NET 7.0 SDK or later
+- .NET 8.0 SDK or later
 - SQL Server or SQLite (configured in `AppDbContext`)
 
 ### Setup

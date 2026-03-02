@@ -1,4 +1,3 @@
-using shlabs.DataQuery.Abstractions.Dynamic;
 using shlabs.DataQuery.Abstractions.Utils;
 using System.Collections;
 using System.Linq.Expressions;
@@ -17,12 +16,29 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
 
     public IQueryOrder<TEntity>? Order { get; set; }
 
+    public QueryBuilder()
+    {
+    }
+    
+    public QueryBuilder(Expression<Func<TEntity, bool>>? filter)
+    {
+        Filter = filter;
+    }
+        
     #region Include
 
     public void Include(IQueryInclude<TEntity> include)
     {
         _includes ??= [];
         _includes.Add(include);
+    }
+    
+    public void Include(IEnumerable<IQueryInclude<TEntity>> include)
+    {
+        foreach (var incl in include)
+        {
+            Include(incl);
+        }
     }
 
     public void Include<TProperty>(QueryIncludeEntity<TEntity, TProperty> include) where TProperty : class
@@ -58,23 +74,35 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
         where TProperty : class
     {
         _includes ??= new();
-        var includeInfo = new QueryIncludeList<TEntity, TProperty>(property, filter, null);
+        var includeInfo = new QueryIncludeList<TEntity, TProperty>(property, filter);
         _includes.Add(includeInfo);
 
         return includeInfo;
     }
 
+    public QueryBuilder<TEntity> AddInclude(IQueryInclude<TEntity> include)
+    {
+        Include(include);
+        return this;
+    }
+    
+    public QueryBuilder<TEntity> AddInclude(IEnumerable<IQueryInclude<TEntity>> include)
+    {
+        Include(include);
+        return this;
+    }
+    
     public QueryBuilder<TEntity> AddIncludeEntity<TProperty>(Expression<Func<TEntity, TProperty?>> property)
         where TProperty : class
     {
-        IncludeEntity<TProperty>(property);
+        IncludeEntity(property);
         return this;
     }
 
     public QueryBuilder<TEntity> AddIncludeList<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property, Expression<Func<TProperty, bool>>? filter = null)
         where TProperty : class
     {
-        IncludeList<TProperty>(property, filter);
+        IncludeList(property, filter);
         return this;
     }
     
@@ -82,7 +110,7 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
         where TProperty : class
     {
         _includes ??= new();
-        var includeInfo = new QueryIncludeList<TEntity, TProperty>(property, null, null);
+        var includeInfo = new QueryIncludeList<TEntity, TProperty>(property, null);
         includeInfo = config(includeInfo);
         _includes.Add(includeInfo);
         
@@ -131,8 +159,13 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
 
     #endregion
 
-    public QueryBuilder<TEntity> AppendFilter(Expression<Func<TEntity, bool>> filter, Conditions condition = Conditions.And)
+    public QueryBuilder<TEntity> AppendFilter(Expression<Func<TEntity, bool>>? filter, Conditions condition = Conditions.And)
     {
+        if (filter is null)
+        {
+            return this;
+        }
+        
         if (Filter is null)
         {
             Filter = filter;
@@ -167,5 +200,19 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
     {
         Filter = filter;
         return this;
+    }
+
+    public QueryBuilder<TEntity> Clone()
+    {
+        var cloned = new QueryBuilder<TEntity>
+        {
+            Filter = Filter,
+            Order = Order,
+            Take = Take,
+            Skip = Skip,
+            _includes = _includes != null ? new List<IQueryInclude<TEntity>>(_includes) : null
+        };
+
+        return cloned;
     }
 }
