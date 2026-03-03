@@ -42,6 +42,12 @@ public class TestDataQuery : CoreUnitTest
     {
         var queryBuilder = new QueryBuilder<Teacher>();
         var schoolCalsses = queryBuilder.Include(s => s.SchoolClasses);
-        var school = queryBuilder.Include(s => s.School);
+        var school = queryBuilder.Include(s => s.School)
+            .ThenInclude(x => x.SchoolClasses);
+
+        var studenQuery = new QueryBuilder<Student>()
+            .AddInclude(x => x.Grades);
+
+        studenQuery.Take = 1;
     }
 }

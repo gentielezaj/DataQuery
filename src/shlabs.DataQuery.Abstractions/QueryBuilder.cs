@@ -55,39 +55,23 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
 
     public QueryIncludeList<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, ICollection<TProperty>?>> property)
         where TProperty : class
-    {
-        _includes ??= new();
-        var includeInfo = new QueryIncludeList<TEntity, TProperty>(property, null);
-        _includes.Add(includeInfo);
-
-        return includeInfo;
-    }
+        => Include(property, null);
 
     public QueryIncludeList<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property)
         where TProperty : class
-    {
-        _includes ??= new();
-        var includeInfo = new QueryIncludeList<TEntity, TProperty>(property, null);
-        _includes.Add(includeInfo);
+        => Include(property, null);
 
-        return includeInfo;
-    }
+    public QueryIncludeList<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, ICollection<TProperty>?>> property, Expression<Func<TProperty, bool>>? filter)
+        where TProperty : class
+        => IncludeList(property.ToEnumerableExpression(), filter);
+
+    public QueryIncludeList<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property, Expression<Func<TProperty, bool>>? filter)
+        where TProperty : class
+        => IncludeList(property, filter);
 
     public QueryIncludeEntity<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, TProperty?>> property)
         where TProperty : class
-    {
-        var propertyType = typeof(TProperty);
-        if (typeof(IEnumerable).IsAssignableFrom(propertyType))
-        {
-            throw new ArgumentException("Use IncludeList for collections");
-        }
-
-        _includes ??= new();
-        var includeInfo = new QueryIncludeEntity<TEntity, TProperty>(property);
-        _includes.Add(includeInfo);
-
-        return includeInfo;
-    }
+        => IncludeEntity(property);
 
     public QueryIncludeEntity<TEntity, TProperty> IncludeEntity<TProperty>(Expression<Func<TEntity, TProperty?>> property)
         where TProperty : class
@@ -127,7 +111,36 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
         Include(include);
         return this;
     }
-    
+
+    public QueryBuilder<TEntity> AddInclude<TProperty>(Expression<Func<TEntity, ICollection<TProperty>?>> property)
+        where TProperty : class
+        => AddInclude(property, null);
+
+    public QueryBuilder<TEntity> AddInclude<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property)
+        where TProperty : class
+        => AddInclude(property, null);
+
+    public QueryBuilder<TEntity> AddInclude<TProperty>(Expression<Func<TEntity, ICollection<TProperty>?>> property, Expression<Func<TProperty, bool>>? filter)
+        where TProperty : class
+    {
+        IncludeList(property.ToEnumerableExpression(), filter);
+        return this;
+    }
+
+    public QueryBuilder<TEntity> AddInclude<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property, Expression<Func<TProperty, bool>>? filter)
+        where TProperty : class
+    {
+        IncludeList(property, filter);
+        return this;
+    }
+
+    public QueryBuilder<TEntity> AddInclude<TProperty>(Expression<Func<TEntity, TProperty?>> property)
+        where TProperty : class
+    {
+        IncludeEntity(property);
+        return this;
+    }
+
     public QueryBuilder<TEntity> AddIncludeEntity<TProperty>(Expression<Func<TEntity, TProperty?>> property)
         where TProperty : class
     {

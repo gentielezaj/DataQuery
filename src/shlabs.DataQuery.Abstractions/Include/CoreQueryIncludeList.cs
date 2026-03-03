@@ -14,4 +14,18 @@ public abstract class CoreQueryIncludeList<TEntity, TProperty>(
     public int? Take { get; set; }
     public int? Skip { get; set; }
     public IQueryOrder<TProperty>? Order { get; set; }
+
+    public void SetOrder(params IQueryOrder<TProperty>[] orders)
+    {
+        if (orders.Length == 0)
+        {
+            return;
+        }
+
+        var quqer = new Queue<IQueryOrder<TProperty>>(orders);
+        Order = quqer.Dequeue();
+        Order = Order.AddOrderBy(quqer);
+
+        return;
+    }
 }

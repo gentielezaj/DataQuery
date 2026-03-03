@@ -24,15 +24,27 @@ public abstract class QueryInclude<TEntity, TPropertyUnderlying>(
     public IThenQueryInclude<TPropertyUnderlying>? ThenIncludes { get; set; } = thenIncludes;
 
     public ThenQueryIncludeList<TPropertyUnderlying, TNextProperty> ThenInclude<TNextProperty>(
+        Expression<Func<TPropertyUnderlying, IEnumerable<TNextProperty>?>> navigation) where TNextProperty : class
+    {
+        return ThenInclude(navigation, null);
+    }
+
+    public ThenQueryIncludeList<TPropertyUnderlying, TNextProperty> ThenInclude<TNextProperty>(
+        Expression<Func<TPropertyUnderlying, ICollection<TNextProperty>?>> navigation) where TNextProperty : class
+    {
+        return ThenInclude(navigation.ToEnumerableExpression(), null);
+    }
+
+    public ThenQueryIncludeList<TPropertyUnderlying, TNextProperty> ThenInclude<TNextProperty>(
         Expression<Func<TPropertyUnderlying, IEnumerable<TNextProperty>?>> navigation,
-        Expression<Func<TNextProperty, bool>>? filter = null) where TNextProperty : class
+        Expression<Func<TNextProperty, bool>>? filter) where TNextProperty : class
     {
         return ThenIncludeList(navigation, filter);
     }
 
     public ThenQueryIncludeList<TPropertyUnderlying, TNextProperty> ThenInclude<TNextProperty>(
         Expression<Func<TPropertyUnderlying, ICollection<TNextProperty>?>> navigation,
-        Expression<Func<TNextProperty, bool>>? filter = null) where TNextProperty : class
+        Expression<Func<TNextProperty, bool>>? filter) where TNextProperty : class
     {
         return ThenIncludeList(navigation.ToEnumerableExpression(), filter);
     }
