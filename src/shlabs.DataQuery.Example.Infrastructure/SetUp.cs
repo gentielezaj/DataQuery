@@ -4,7 +4,7 @@ namespace shlabs.DataQuery.Example.Infrastructure;
 
 public class SetUp
 {
-    public const string DbPath = "E:\\db\\QueryBuilder.db";
+    public const string DbPath = "C:\\workspace\\github\\gentielezaj\\DataQuery\\QueryBuilder.db";
 
     public static void SetupDatabase()
     {

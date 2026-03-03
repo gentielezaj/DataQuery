@@ -10,7 +10,7 @@ public interface IQueryIncludeEntity<TEntity> : IQueryInclude<TEntity>, IQueryIn
 public class QueryIncludeEntity<TEntity, TProperty>(
     Expression<Func<TEntity, TProperty?>> navigation,
     IThenQueryInclude<TProperty>? thenIncludes = null)
-    : CoreQueryInclude<TEntity, TProperty, TProperty>(navigation, thenIncludes), IQueryIncludeEntity<TEntity>
+    : QueryInclude<TEntity, TProperty, TProperty>(navigation, thenIncludes), IQueryIncludeEntity<TEntity>
     where TEntity : class
     where TProperty : class
 {

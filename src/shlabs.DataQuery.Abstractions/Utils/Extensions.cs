@@ -23,5 +23,16 @@ namespace shlabs.DataQuery.Abstractions.Utils
             );
             return Expression.Lambda<Func<T, bool>>(body, parameter);
         }
+
+        public static Expression<Func<TEntity, IEnumerable<TProperty>?>> ToEnumerableExpression<TEntity, TProperty>(
+            this Expression<Func<TEntity, ICollection<TProperty>?>> source)
+        {
+            // We take the existing body and parameters and wrap them 
+            // in the new Func signature.
+            return Expression.Lambda<Func<TEntity, IEnumerable<TProperty>?>>(
+                source.Body,
+                source.Parameters
+            );
+        }
     }
 }

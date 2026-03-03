@@ -53,6 +53,42 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
         _includes.Add(include);
     }
 
+    public QueryIncludeList<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, ICollection<TProperty>?>> property)
+        where TProperty : class
+    {
+        _includes ??= new();
+        var includeInfo = new QueryIncludeList<TEntity, TProperty>(property, null);
+        _includes.Add(includeInfo);
+
+        return includeInfo;
+    }
+
+    public QueryIncludeList<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, IEnumerable<TProperty>?>> property)
+        where TProperty : class
+    {
+        _includes ??= new();
+        var includeInfo = new QueryIncludeList<TEntity, TProperty>(property, null);
+        _includes.Add(includeInfo);
+
+        return includeInfo;
+    }
+
+    public QueryIncludeEntity<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, TProperty?>> property)
+        where TProperty : class
+    {
+        var propertyType = typeof(TProperty);
+        if (typeof(IEnumerable).IsAssignableFrom(propertyType))
+        {
+            throw new ArgumentException("Use IncludeList for collections");
+        }
+
+        _includes ??= new();
+        var includeInfo = new QueryIncludeEntity<TEntity, TProperty>(property);
+        _includes.Add(includeInfo);
+
+        return includeInfo;
+    }
+
     public QueryIncludeEntity<TEntity, TProperty> IncludeEntity<TProperty>(Expression<Func<TEntity, TProperty?>> property)
         where TProperty : class
     {

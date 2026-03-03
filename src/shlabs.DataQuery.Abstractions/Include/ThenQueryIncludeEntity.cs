@@ -10,7 +10,7 @@ public interface IThenQueryIncludeEntity<TPreviousProperty> : IThenQueryInclude<
 public class ThenQueryIncludeEntity<TPreviousProperty, TNextProperty>(
     Expression<Func<TPreviousProperty, TNextProperty?>> navigation,
     IThenQueryInclude<TNextProperty>? thenIncludes)
-    : CoreQueryInclude<TPreviousProperty, TNextProperty, TNextProperty>(navigation, thenIncludes),
+    : QueryInclude<TPreviousProperty, TNextProperty, TNextProperty>(navigation, thenIncludes),
         IThenQueryIncludeEntity<TPreviousProperty>
     where TPreviousProperty : class
     where TNextProperty : class

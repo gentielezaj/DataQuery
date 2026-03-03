@@ -36,4 +36,12 @@ public class TestDataQuery : CoreUnitTest
             Assert.All(teacher.School.Students, teacher => Assert.Equal(studentName, teacher.Name));
         });
     }
+
+    [Fact]
+    public async Task TestQueryEntityAndList()
+    {
+        var queryBuilder = new QueryBuilder<Teacher>();
+        var schoolCalsses = queryBuilder.Include(s => s.SchoolClasses);
+        var school = queryBuilder.Include(s => s.School);
+    }
 }

@@ -1,3 +1,4 @@
+using shlabs.DataQuery.Abstractions.Utils;
 using System.Linq.Expressions;
 
 namespace shlabs.DataQuery.Abstractions;
@@ -13,4 +14,10 @@ public class QueryIncludeList<TEntity, TProperty>(
     IThenQueryInclude<TProperty>? thenIncludes = null)
     : CoreQueryIncludeList<TEntity, TProperty>(navigation, filter, thenIncludes), IQueryIncludeList<TEntity>
     where TEntity : class
-    where TProperty : class;
+    where TProperty : class
+{
+    public QueryIncludeList(Expression<Func<TEntity, ICollection<TProperty>?>> navigation, IThenQueryInclude<TProperty>? thenIncludes = null)
+        : this(navigation.ToEnumerableExpression(), null, thenIncludes)
+    {
+    }
+}
