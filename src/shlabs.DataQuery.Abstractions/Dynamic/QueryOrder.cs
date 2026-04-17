@@ -26,7 +26,8 @@ public class QueryOrder(string field, QueryOrderDirections direction)
     public IQueryOrder ToQueryOrder(Type type)
     {
         var parameter = Expression.Parameter(type, "x");
-        var selection = Expression.PropertyOrField(parameter, Field);
+        var fields = Field.Split('.');
+        Expression selection = fields.Aggregate((Expression)parameter, Expression.PropertyOrField);
     
         // Create a generic lambda with dynamic property type
         var propertyType = selection.Type;
