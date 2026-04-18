@@ -201,7 +201,7 @@ public class QueryBuilder<TEntity> : CoreQueryBuilder
 
         var quqer = new Queue<IQueryOrder<TEntity>>(orders);
         Order = quqer.Dequeue();
-        Order = Order.AddOrderBy(quqer);
+        Order.AddOrderBy(quqer);
 
         return this;
     }

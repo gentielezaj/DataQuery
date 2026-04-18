@@ -1,6 +1,6 @@
 # shlabs.DataQuery
 
-A C# library for advanced, composable querying with Entity Framework Core using a custom `QueryBuilder` abstraction. This project enables dynamic query construction, including filtering, ordering, and navigation property inclusion, with a focus on flexibility and testability.
+A C# library for advanced, composable querying with Entity Framework Core using a custom `QueryBuilder` abstraction. This project enables dynamic query construction, including filtering, ordering, and navigation property inclusion, with a focus on flexibility and  testability.
 
 ## Features
 
