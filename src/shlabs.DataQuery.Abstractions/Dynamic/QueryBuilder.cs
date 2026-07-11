@@ -13,7 +13,7 @@ public class QueryBuilder : CoreQueryBuilder
         Order.Add(new QueryOrder(field, direction));
     }
 
-    public QueryBuilder<T> ToQueryBuilder<T>()
+    public QueryBuilder<T> ToQueryBuilder<T>(QueryBuilderFilterRuleConvertorOptions? options = null)
         where T : class
     {
         return new QueryBuilder<T>
@@ -21,7 +21,7 @@ public class QueryBuilder : CoreQueryBuilder
             Order = ToQueryBuilderOrder<T>(),
             Skip = Skip,
             Take = Take,
-            Filter = Filter?.ToQueryBuilderFilter<T>()
+            Filter = Filter?.ToQueryBuilderFilter<T>(options)
         };
     }
 

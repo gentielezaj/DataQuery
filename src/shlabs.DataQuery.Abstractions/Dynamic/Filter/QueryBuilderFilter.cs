@@ -7,7 +7,7 @@ public class QueryBuilderFilter : QueryBuilderFilterRule
     public List<QueryBuilderFilterRule>? Rules { get; set; } = new();
     public Conditions Condition { get; set; }
 
-    public override Expression<Func<T, bool>> ToQueryBuilderFilter<T>()
+    public override Expression<Func<T, bool>> ToQueryBuilderFilter<T>(QueryBuilderFilterRuleConvertorOptions? options = null)
     {
         if (Rules == null || !Rules.Any())
         {
@@ -19,7 +19,7 @@ public class QueryBuilderFilter : QueryBuilderFilterRule
 
         foreach (var rule in Rules)
         {
-            var ruleExpression = rule.ToQueryBuilderFilter<T>();
+            var ruleExpression = rule.ToQueryBuilderFilter<T>(options);
             var invokedExpression = Expression.Invoke(ruleExpression, parameter);
 
             if (combined == null)

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace shlabs.DataQuery.Abstractions.Dynamic;
@@ -17,11 +18,25 @@ public class QueryBuilderFilterCriteria(
     {
     }
 
-    public override Expression<Func<T, bool>> ToQueryBuilderFilter<T>()
+    public override Expression<Func<T, bool>> ToQueryBuilderFilter<T>(QueryBuilderFilterRuleConvertorOptions? options = null)
     {
         var parameter = Expression.Parameter(typeof(T), "x");
         var member = GetNestedProperty(parameter, Field);
-        var constant = Expression.Constant(Convert.ChangeType(Value, member.Type));
+        var typedValue = Convert.ChangeType(Value, member.Type);
+
+        var propType = Nullable.GetUnderlyingType(member.Type) ?? member.Type;
+        if (propType == typeof(DateTime) && options?.DateTimeKind != null && Value != null
+            && DateTime.TryParse(Value, null, DateTimeStyles.RoundtripKind, out var dateTime))
+        {
+            if (options?.DateTimeKind is not null)
+            {
+                dateTime = DateTime.SpecifyKind(dateTime, options.DateTimeKind.Value);
+            }
+
+            typedValue = dateTime;
+        }
+
+        var constant = Expression.Constant(typedValue, member.Type);
 
         Expression body = Operator switch
         {
