@@ -33,7 +33,7 @@ public class QueryBuilder : CoreQueryBuilder
         }
 
         IQueryOrder<T>? orderInfo = null;
-        IQueryOrder<T> rootOrder;
+        IQueryOrder<T>? rootOrder = null;
 
         foreach (var item in Order)
         {
@@ -60,6 +60,6 @@ public class QueryBuilder : CoreQueryBuilder
             }
         }
 
-        return orderInfo;
+        return rootOrder;
     }
 }

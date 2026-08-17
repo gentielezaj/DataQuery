@@ -7,6 +7,6 @@ public abstract class CoreUnitTest : IClassFixture<DatabaseFixture>
     public AppDbContext DbContext { get; }
     protected CoreUnitTest(DatabaseFixture fixture)
     {
-        DbContext = fixture.DbContext;
+        DbContext = fixture.CreateDbContext();
     }
 }

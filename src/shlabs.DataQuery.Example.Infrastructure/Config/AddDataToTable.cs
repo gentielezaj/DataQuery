@@ -41,5 +41,25 @@ public class AddDataToTable
             new Grade { Id = 5, Value = "F", StudentId = 2, SchoolClassId = 2 },
             new Grade { Id = 6, Value = "G", StudentId = 3, SchoolClassId = 2 }
         );
+
+        // Seed Events
+        modelBuilder.Entity<Event>().HasData(
+            new Event { Id = 4, Name = "🛏️ Postelinat", Date = new DateOnly(2026, 8, 16), IsDone = true, Order = 10, StudentId = 1 },
+            new Event { Id = 1, Name = "🔺 check-out", Date = new DateOnly(2026, 8, 16), IsDone = true, Order = 1, StudentId = 1 },
+            new Event { Id = 5, Name = "⬇️ check-in", Date = new DateOnly(2026, 8, 16), IsDone = true, Order = 100, StudentId = 1 },
+            new Event { Id = 2, Name = "🔺 check-out", Date = new DateOnly(2026, 8, 16), IsDone = true, Order = 1, StudentId = 1 },
+            new Event { Id = 3, Name = "🔺 check-out", Date = new DateOnly(2026, 8, 16), IsDone = true, Order = 1, StudentId = 1 },
+
+            new Event { Id = 7, Name = "🛏️ Postelinat", Date = new DateOnly(2026, 8, 17), IsDone = false, Order = 10, StudentId = 1 },
+            new Event { Id = 9, Name = "🛏️ Postelinat", Date = new DateOnly(2026, 8, 17), IsDone = true, Order = 10, StudentId = 1 },
+            new Event { Id = 8, Name = "🔺 check-out", Date = new DateOnly(2026, 8, 17), IsDone = true, Order = 1, StudentId = 1 },
+            new Event { Id = 6, Name = "🔺 check-out", Date = new DateOnly(2026, 8, 17), IsDone = false, Order = 1, StudentId = 1 },
+
+            new Event { Id = 14, Name = "⬇️ check-in", Date = new DateOnly(2026, 8, 18), IsDone = false, Order = 100, StudentId = 1 },
+            new Event { Id = 13, Name = "⬇️ check-in", Date = new DateOnly(2026, 8, 18), IsDone = false, Order = 100, StudentId = 1 },
+            new Event { Id = 10, Name = "🔺 check-out", Date = new DateOnly(2026, 8, 18), IsDone = false, Order = 1, StudentId = 1 },
+            new Event { Id = 11, Name = "🛏️ Postelinat", Date = new DateOnly(2026, 8, 18), IsDone = false, Order = 10, StudentId = 1 },
+            new Event { Id = 12, Name = "🛏️ Postelinat", Date = new DateOnly(2026, 8, 18), IsDone = false, Order = 10, StudentId = 1 }
+        );
     }
 }

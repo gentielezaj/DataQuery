@@ -14,7 +14,7 @@ public static class QueryOrderToQueryable
         foreach (var item in orderInfos)
         {
             var parameter = Expression.Parameter(typeof(T), "x");
-            Expression selector = ExpressionUtils.BuildSelector(parameter, queryOrder.LambdaSelector.Body);
+            Expression selector = ExpressionUtils.BuildSelector(parameter, item.LambdaSelector.Body);
 
             var methodName = Equals(item.Direction, QueryOrderDirections.Desc)
                 ? (count == 0 ? "OrderByDescending" : "ThenByDescending")
