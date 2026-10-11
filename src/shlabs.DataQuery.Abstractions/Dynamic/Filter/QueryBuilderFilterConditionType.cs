@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace shlabs.DataQuery.Abstractions.Dynamic;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum QueryBuilderCriteriaConditions
 {
     Equal,

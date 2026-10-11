@@ -161,8 +161,8 @@ expressions into dynamic DTOs.
   the builder or translator. Execution belongs to the caller after
   `ToQueryable`.
 - Preserve source compatibility for public package APIs. Both main projects
-  are packable and currently publish version `0.0.12`; coordinate package
-  metadata/version changes intentionally.
+  are packable; read their current versions from the `.csproj` files and
+  coordinate package metadata/version changes intentionally.
 - The public translation extension classes intentionally live in the
   `System.Linq` namespace, enabling `builder.ToQueryable(...)`. Do not move
   them without considering breaking changes and extension-method discovery.

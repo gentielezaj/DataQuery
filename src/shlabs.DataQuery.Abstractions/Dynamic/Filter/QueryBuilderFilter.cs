@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Text.Json.Serialization;
 
 namespace shlabs.DataQuery.Abstractions.Dynamic;
 
@@ -60,6 +61,7 @@ public class QueryBuilderFilter : QueryBuilderFilterRule
         };
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Conditions
     {
         And,

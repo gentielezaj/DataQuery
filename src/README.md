@@ -329,6 +329,173 @@ are allowed for the request type and return a clear validation error when
 conversion or property lookup fails. Use `QueryBuilderFilterRuleConvertorOptions`
 when dynamic date/time conversion needs a specific `DateTimeKind`.
 
+### JSON parsing and ASP.NET Core controllers
+
+Register **both** `new JsonStringEnumConverter()` and
+`new QueryBuilderFilterRuleConverter()` when parsing JSON for
+`shlabs.DataQuery.Abstractions.Dynamic.QueryBuilder`. The first supports string
+enum names such as `"asc"`, `"and"`, and `"equal"`; the second deserializes
+polymorphic filter rules (criteria and nested groups).
+
+For MVC controllers, configure these once in your application's `Program.cs`:
+
+```csharp
+using System.Text.Json.Serialization;
+using shlabs.DataQuery.Abstractions.Utils;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.Converters.Add(new QueryBuilderFilterRuleConverter());
+});
+
+// Register your application's DbContext here as usual.
+var app = builder.Build();
+app.MapControllers();
+app.Run();
+```
+
+ASP.NET Core's web JSON defaults support camel-case properties and
+case-insensitive property matching. For standalone parsing, supply equivalent
+options explicitly:
+
+```csharp
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using shlabs.DataQuery.Abstractions.Utils;
+using DynamicQueryBuilder = shlabs.DataQuery.Abstractions.Dynamic.QueryBuilder;
+
+var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+options.Converters.Add(new JsonStringEnumConverter());
+options.Converters.Add(new QueryBuilderFilterRuleConverter());
+
+DynamicQueryBuilder request =
+    JsonSerializer.Deserialize<DynamicQueryBuilder>(json, options)
+    ?? throw new JsonException("A query object is required.");
+
+QueryBuilder<Student> typed = request.ToQueryBuilder<Student>();
+```
+
+#### POST: send the model as a JSON body
+
+Send `POST /api/students/search` with `Content-Type: application/json` and this
+body. Numeric values can be sent as JSON numbers or strings; criteria store
+them as strings before conversion to the entity property's type.
+
+```json
+{
+  "filter": {
+    "condition": "and",
+    "rules": [
+      { "field": "name", "operator": "contains", "value": "Jane" },
+      { "field": "schoolId", "operator": "equal", "value": 1 }
+    ]
+  },
+  "order": [
+    { "field": "name", "direction": "asc" },
+    { "field": "id", "direction": "asc" }
+  ],
+  "skip": 0,
+  "take": 20
+}
+```
+
+#### GET: send the model as a JSON query parameter
+
+For GET, send the same JSON as a URL-encoded `query` parameter:
+`GET /api/students?query=<URL-encoded JSON>`. For example, in a browser client:
+
+```javascript
+const model = {
+  filter: {
+    condition: "and",
+    rules: [{ field: "schoolId", operator: "equal", value: 1 }]
+  },
+  order: [{ field: "id", direction: "asc" }],
+  skip: 0,
+  take: 20
+};
+
+// POST body binding:
+await fetch("/api/students/search", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(model)
+});
+
+// GET with a URL-encoded JSON parameter:
+const parameters = new URLSearchParams({ query: JSON.stringify(model) });
+await fetch(`/api/students?${parameters}`);
+```
+
+The controller below uses the repository's sample `AppDbContext` and `Student`
+model. POST automatically binds the body to the dynamic builder. GET accepts a
+string and explicitly deserializes it with the configured MVC JSON options;
+`[FromQuery] DynamicQueryBuilder` does not parse a JSON query parameter.
+Both actions convert the request into `QueryBuilder<Student>` before applying it.
+
+```csharp
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using shlabs.DataQuery.Abstractions;
+using shlabs.DataQuery.Example.Infrastructure;
+using shlabs.DataQuery.Example.Infrastructure.Models;
+using DynamicQueryBuilder = shlabs.DataQuery.Abstractions.Dynamic.QueryBuilder;
+
+[ApiController]
+[Route("api/students")]
+public class StudentsController(
+    AppDbContext db,
+    IOptions<Microsoft.AspNetCore.Mvc.JsonOptions> jsonOptions) : ControllerBase
+{
+    [HttpPost("search")]
+    public Task<ActionResult<List<Student>>> Search(
+        [FromBody] DynamicQueryBuilder request,
+        CancellationToken cancellationToken)
+        => Execute(request, cancellationToken);
+
+    [HttpGet]
+    public async Task<ActionResult<List<Student>>> Get(
+        [FromQuery] string query,
+        CancellationToken cancellationToken)
+    {
+        DynamicQueryBuilder? request;
+        try
+        {
+            request = JsonSerializer.Deserialize<DynamicQueryBuilder>(
+                query, jsonOptions.Value.JsonSerializerOptions);
+        }
+        catch (JsonException)
+        {
+            return BadRequest("The query parameter must contain valid query JSON.");
+        }
+
+        if (request is null)
+            return BadRequest("A query object is required.");
+
+        return await Execute(request, cancellationToken);
+    }
+
+    private async Task<ActionResult<List<Student>>> Execute(
+        DynamicQueryBuilder request,
+        CancellationToken cancellationToken)
+    {
+        QueryBuilder<Student> typed = request.ToQueryBuilder<Student>();
+        var students = await typed.ToQueryable(db.Students.AsNoTracking())
+            .ToListAsync(cancellationToken);
+        return Ok(students);
+    }
+}
+```
+
+Use your application's entity or response DTO in place of the sample model.
+The field-validation and conversion-error handling described above also apply
+to these endpoints.
+
 ## Clone a query definition
 
 Use `Clone()` to reuse a base definition while changing its top-level state:
