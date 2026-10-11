@@ -1,0 +1,31 @@
+{
+  "name": "shlabs-dataquery",
+  "version": "0.1.1",
+  "description": "TypeScript JSON models and helpers for shlabs.DataQuery dynamic queries",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE.txt"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gentielezaj/DataQuery.git",
+    "directory": "src/shlabs.DataQuery.TypeScript"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "npm run build && npm run typecheck && node --test test/*.test.mjs",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

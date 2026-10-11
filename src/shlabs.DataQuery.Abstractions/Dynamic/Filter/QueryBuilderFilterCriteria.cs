@@ -8,13 +8,13 @@ namespace shlabs.DataQuery.Abstractions.Dynamic;
 public class QueryBuilderFilterCriteria(
     string field,
     QueryBuilderCriteriaConditions @operator,
-    string value)
+    string? value)
     : QueryBuilderFilterRule
 {
     public string Field { get; set; } = field;
 
     [JsonConverter(typeof(QueryBuilderFilterCriteriaValueJsonConverter))]
-    public string Value { get; set; } = value;
+    public string? Value { get; set; } = value;
 
     public QueryBuilderCriteriaConditions Operator { get; set; } = @operator;
 
@@ -27,11 +27,22 @@ public class QueryBuilderFilterCriteria(
     {
         var parameter = Expression.Parameter(typeof(T), "x");
         var member = GetNestedProperty(parameter, Field);
-        var typedValue = member.Type.IsEnum
-            ? Enum.Parse(member.Type, Value, ignoreCase: true)
-            : Convert.ChangeType(Value, member.Type);
-
         var propType = Nullable.GetUnderlyingType(member.Type) ?? member.Type;
+        if (Operator is QueryBuilderCriteriaConditions.Null or QueryBuilderCriteriaConditions.NotNull)
+        {
+            var nullConstant = Expression.Constant(null, member.Type);
+            var nullComparison = Operator == QueryBuilderCriteriaConditions.Null
+                ? Expression.Equal(member, nullConstant)
+                : Expression.NotEqual(member, nullConstant);
+            return Expression.Lambda<Func<T, bool>>(nullComparison, parameter);
+        }
+
+        var typedValue = Value is null
+            ? null
+            : propType.IsEnum
+                ? Enum.Parse(propType, Value, ignoreCase: true)
+                : Convert.ChangeType(Value, propType);
+
         if (propType == typeof(DateTime) && options?.DateTimeKind != null && Value != null
             && DateTime.TryParse(Value, null, DateTimeStyles.RoundtripKind, out var dateTime))
         {
@@ -43,7 +54,13 @@ public class QueryBuilderFilterCriteria(
             typedValue = dateTime;
         }
 
-        var constant = Expression.Constant(typedValue, member.Type);
+        Expression constant = typedValue is null
+            ? Expression.Constant(null, member.Type)
+            : Expression.Constant(typedValue, propType);
+        if (typedValue is not null && propType != member.Type)
+        {
+            constant = Expression.Convert(constant, member.Type);
+        }
 
         Expression body = Operator switch
         {
@@ -57,8 +74,6 @@ public class QueryBuilderFilterCriteria(
                 typeof(string).GetMethod("Contains", new[] { typeof(string) })!, constant),
             QueryBuilderCriteriaConditions.NotContains => Expression.Not(Expression.Call(member,
                 typeof(string).GetMethod("Contains", new[] { typeof(string) })!, constant)),
-            QueryBuilderCriteriaConditions.Null => Expression.Equal(member, Expression.Constant(null)),
-            QueryBuilderCriteriaConditions.NotNull => Expression.NotEqual(member, Expression.Constant(null)),
             _ => throw new Exception($"Condition type '{Operator}' is not Supported.")
         };
 

@@ -3,6 +3,7 @@
 ## Working scope
 - The active solution is `src/shlabs.DataQuery.sln`; `archive/QueryInfo.sln` is a separate historical implementation. Target `src/` for DataQuery changes.
 - Read `src/AGENTS.md` for builder/translation conventions; `src/README.md` contains usage examples.
+- `src/shlabs.DataQuery.TypeScript` is a standalone npm package for dynamic-query JSON types/helpers, outside the .NET solution. From that directory run `npm ci`, `npm test` (build + type checks + Node tests), and `npm pack`; `prepack` builds the distributable. The NuGet workflow does not publish it.
 
 ## Commands
 Run these from `src/` so `global.json` selects the .NET 8 SDK (`latestMinor` roll-forward, no prereleases). All active projects target `net8.0`.

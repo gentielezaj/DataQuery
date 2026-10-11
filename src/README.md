@@ -323,11 +323,56 @@ The supported criteria are `Equal`, `NotEqual`, `Greater`, `Less`,
 `GreaterOrEqual`, `LessOrEqual`, `Contains`, `NotContains`, `Null`, and
 `NotNull`. `In` and `NotIn` are declared but are not implemented.
 
+Nullable properties (such as `int?` and enum types with `?`) are supported:
+values are converted to their underlying type before comparison. Enum names
+are parsed case-insensitively. Use JSON `null` (not the string `"null"`) for
+null equality, or use `"null"` / `"notNull"` operators on nullable or reference
+properties; these operators do not require a value.
+
+```json
+{
+  "filter": {
+    "condition": "and",
+    "rules": [
+      { "field": "nullableEnum", "operator": "equal", "value": "Value2" },
+      { "field": "nullableInteger", "operator": "equal", "value": 45 },
+      { "field": "optionalName", "operator": "notNull" }
+    ]
+  }
+}
+```
+
+These example fields must exist on the entity passed to `ToQueryBuilder<T>()`.
+
 Dynamic field paths may be nested (for example, `"School.Name"`). Treat field
 names and values received from clients as untrusted input: validate that fields
 are allowed for the request type and return a clear validation error when
 conversion or property lookup fails. Use `QueryBuilderFilterRuleConvertorOptions`
 when dynamic date/time conversion needs a specific `DateTimeKind`.
+
+### TypeScript / npm client
+
+The standalone [`shlabs-dataquery` package](shlabs.DataQuery.TypeScript/README.md)
+provides TypeScript JSON models and lightweight helpers for the dynamic builder.
+Build and pack it from `src/shlabs.DataQuery.TypeScript` using `npm ci`,
+`npm test`, and `npm pack`, then install the generated `.tgz` in your frontend
+with `npm install /path/to/shlabs-dataquery-0.1.1.tgz`.
+
+```typescript
+import { and, criteria, asc, page, type DynamicQueryBuilder } from "shlabs-dataquery";
+
+const request: DynamicQueryBuilder = {
+  filter: and(criteria("schoolId", "equal", 1)),
+  order: [asc("id")],
+  ...page(0, 20)
+};
+
+await fetch("/api/students/search", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(request)
+});
+```
 
 ### JSON parsing and ASP.NET Core controllers
 
